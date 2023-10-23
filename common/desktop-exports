@@ -124,10 +124,14 @@ append_dir LD_LIBRARY_PATH "$SNAP_DESKTOP_RUNTIME/usr/lib/$ARCH/pulseaudio"
 prepend_dir __EGL_VENDOR_LIBRARY_DIRS "/var/lib/snapd/lib/glvnd/egl_vendor.d"
 append_dir __EGL_VENDOR_LIBRARY_DIRS "$SNAP_DESKTOP_RUNTIME/usr/share/glvnd/egl_vendor.d"
 
+function check_nvidia() {
+  glxinfo | grep "vendor string: NVIDIA" > /dev/null
+}
+
 # Determine if we're running Nvidia under Wayland (and it's not forced to something else)
 # In order to force loading Nvidia's EGL so we don't fall back to LLVM-pipe
 if [[ "$XDG_SESSION_TYPE" = "wayland" && -e "/var/lib/snapd/lib/gl/libEGL_nvidia.so.0" &&
-  glxinfo | grep "vendor string:NVIDIA" > /dev/null ]]; then
+  check_nvidia() ]]; then
   
   export __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS="$SNAP_DESKTOP_RUNTIME/usr/share/egl/egl_external_platform.d"
 fi
