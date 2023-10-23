@@ -131,7 +131,7 @@ function check_nvidia() {
 # Determine if we're running Nvidia under Wayland (and it's not forced to something else)
 # In order to force loading Nvidia's EGL so we don't fall back to LLVM-pipe
 if [[ "$XDG_SESSION_TYPE" = "wayland" && -e "/var/lib/snapd/lib/gl/libEGL_nvidia.so.0" &&
-  check_nvidia() ]]; then
+  $(check_nvidia) ]]; then
   
   export __EGL_EXTERNAL_PLATFORM_CONFIG_DIRS="$SNAP_DESKTOP_RUNTIME/usr/share/egl/egl_external_platform.d"
 fi
