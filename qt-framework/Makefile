@@ -6,11 +6,13 @@ PLATFORM_DIR         := $(DESTDIR)/qt-framework
 DATA_DIR             := $(DESTDIR)/data-dir
 BIN_DIR              := $(DESTDIR)/command-chain
 LIB_DIR              := $(DESTDIR)/lib
+UTIL_DIR			 := $(DESTDIR)/bin
 DEST_LAUNCHER        := desktop-launch
 LOCALE_GENERATOR     := locale-gen
 DEST_CONFIGURE_HOOK  := hooks-configure-fonts
+GL_UTIL				 := gl_vendor
 
-build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK)
+build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK) $(GL_UTIL)
 
 clean:
 	rm -f $(DEST_LAUNCHER)
@@ -26,6 +28,9 @@ $(DEST_LAUNCHER):
 $(DEST_CONFIGURE_HOOK):
 	@cat $(SRC_DIR)/fonts > $(DEST_CONFIGURE_HOOK)
 
+$(GL_UTIL): $(GL_UTIL).c
+	gcc $(GL_UTIL).c -lGL -lGLX -lX11 -o $(GL_UTIL)
+
 install-$(DEST_LAUNCHER): $(DEST_LAUNCHER)
 	install -d $(PLATFORM_DIR)
 	install -d $(DATA_DIR)
@@ -35,4 +40,7 @@ install-$(DEST_LAUNCHER): $(DEST_LAUNCHER)
 install-$(DEST_CONFIGURE_HOOK): $(DEST_CONFIGURE_HOOK)
 	install -D -m755 $(DEST_CONFIGURE_HOOK) "$(BIN_DIR)"/$(DEST_CONFIGURE_HOOK)
 
-install: install-$(DEST_LAUNCHER) install-$(DEST_CONFIGURE_HOOK)
+install-$(GL_UTIL): $(GL_UTIL)
+	install -D -m755 $(GL_UTIL) "$(UTIL_DIR)"/$(GL_UTIL)
+
+install: install-$(DEST_LAUNCHER) install-$(DEST_CONFIGURE_HOOK) install-$(GL_UTIL)

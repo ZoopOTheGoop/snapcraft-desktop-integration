@@ -6,15 +6,17 @@ PLATFORM_DIR         := $(DESTDIR)/gnome-platform
 DATA_DIR             := $(DESTDIR)/data-dir
 BIN_DIR              := $(DESTDIR)/command-chain
 LIB_DIR              := $(DESTDIR)/lib
+UTIL_DIR			 := $(DESTDIR)/bin
 DEST_LAUNCHER        := desktop-launch
 DEST_CONFIGURE_HOOK  := hooks-configure-fonts
 HW_PLATFORM          := $(shell uname --hardware-platform)
 ARCH                 := $(HW_PLATFORM)-linux-gnu
 WITH_PYTHON          := "3.10"
+GL_UTIL				 := gl_vendor
 
-.PHONY: clean install-$(DESTLAUNCHER) install-$(DEST_CONFIGURE_HOOK)
+.PHONY: clean install-$(DESTLAUNCHER) install-$(DEST_CONFIGURE_HOOK) install-$(GL_UTIL)
 
-build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK)
+build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK) $(GL_UTIL)
 
 clean:
 	rm -f $(DEST_LAUNCHER)
@@ -30,6 +32,9 @@ $(DEST_LAUNCHER):
 $(DEST_CONFIGURE_HOOK):
 	@cat $(SRC_DIR)/fonts > $(DEST_CONFIGURE_HOOK)
 
+$(GL_UTIL): $(GL_UTIL).c
+	gcc $(GL_UTIL).c -lGL -lGLX -lX11 -o $(GL_UTIL)
+
 install-$(DEST_LAUNCHER): $(DEST_LAUNCHER)
 	install -d $(PLATFORM_DIR)
 	install -d $(DATA_DIR)
@@ -41,4 +46,7 @@ install-$(DEST_LAUNCHER): $(DEST_LAUNCHER)
 install-$(DEST_CONFIGURE_HOOK): $(DEST_CONFIGURE_HOOK)
 	install -D -m755 $(DEST_CONFIGURE_HOOK) "$(BIN_DIR)"/$(DEST_CONFIGURE_HOOK)
 
-install: install-$(DEST_LAUNCHER) install-$(DEST_CONFIGURE_HOOK)
+install-$(GL_UTIL): $(GL_UTIL)
+	install -D -m755 $(GL_UTIL) "$(UTIL_DIR)"/$(GL_UTIL)
+
+install: install-$(DEST_LAUNCHER) install-$(DEST_CONFIGURE_HOOK) install-$(GL_UTIL)

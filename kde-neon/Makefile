@@ -5,12 +5,15 @@ SRC_DIR ?= .
 DATA_DIR             := $(DESTDIR)/data-dir
 BIN_DIR              := $(DESTDIR)/snap/command-chain
 LIB_DIR              := $(DESTDIR)/lib
+UTIL_DIR			 := $(DESTDIR)/bin
 DEST_LAUNCHER        := desktop-launch
 LOCALE_GENERATOR     := locale-gen
 BINDTEXTDOMAIN       := bindtextdomain.so
 DEST_CONFIGURE_HOOK  := hooks-configure-desktop
+GL_UTIL				 := gl_vendor
 
-build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK)
+
+build: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK) $(GL_UTIL)
 
 clean:
 	rm -f $(DEST_LAUNCHER)
@@ -28,10 +31,14 @@ $(DEST_LAUNCHER):
 $(DEST_CONFIGURE_HOOK):
 	@cat $(SRC_DIR)/fonts > $(DEST_CONFIGURE_HOOK)
 
-install: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK)
+$(GL_UTIL): $(GL_UTIL).c
+	gcc $(GL_UTIL).c -lGL -lGLX -lX11 -o $(GL_UTIL)
+
+install: $(DEST_LAUNCHER) $(DEST_CONFIGURE_HOOK) $(GL_UTIL)
 	install -d $(DATA_DIR)
 	install -d $(DATA_DIR)/kf5
 	install -D -m755 $(DEST_LAUNCHER) "$(BIN_DIR)"/$(DEST_LAUNCHER)
 	install -D -m755 $(LOCALE_GENERATOR) "$(BIN_DIR)"/$(LOCALE_GENERATOR)
 	install -D -m644 $(BINDTEXTDOMAIN) "$(LIB_DIR)"/$(BINDTEXTDOMAIN)
 	install -D -m755 $(DEST_CONFIGURE_HOOK) "$(BIN_DIR)"/$(DEST_CONFIGURE_HOOK)
+	install -D -m755 $(GL_UTIL) "$(UTIL_DIR)"/$(GL_UTIL)
